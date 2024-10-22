@@ -135,13 +135,13 @@ def main():
     # Тут нужно создать экземпляры классов.
     apple = Apple()
     snake = Snake()
-    
+
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
         snake.update_direction()
         snake.move()
-        
+
         if snake.get_head_position() in snake.positions[2:]:
             snake.reset()
             apple.position = apple.randomize_position()
@@ -150,11 +150,12 @@ def main():
             apple.position = apple.randomize_position()
         elif apple.position in snake.positions[0:]:
             apple.position = apple.randomize_position()
-        
+
         screen.fill(BOARD_BACKGROUND_COLOR)
         snake.draw()
         apple.draw()
         pygame.display.update()
+
 
 if __name__ == '__main__':
     main()
