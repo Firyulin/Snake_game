@@ -38,7 +38,7 @@ class GameObject:
     """Родительский class."""
 
     def __init__(self, position=CENTER_POSITION,
-                 body_color=BOARD_BACKGROUND_COLOR):
+                 body_color=SNAKE_COLOR):
         """Инициализатор родительского класса."""
         self.position = position
         self.body_color = body_color
@@ -51,7 +51,7 @@ class GameObject:
 
     def draw_single_cell(self, position):
         """Отрисовка клетки."""
-        cell = pg.Rect(self.position, (GRID_SIZE, GRID_SIZE))
+        cell = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, self.color, cell)
         pg.draw.rect(screen, self.border_color, cell, 1)
 
@@ -87,14 +87,13 @@ class Apple(GameObject):
 class Snake(GameObject):
     """Класс змеи."""
 
-    def __init__(self):
-        super().__init__(CENTER_POSITION, SNAKE_COLOR)
+    def __init__(self, position=CENTER_POSITION, body_color=SNAKE_COLOR):
+        super().__init__(position, body_color)
         self.reset()
 
-    def update_direction(self, new_direction):
+    def update_direction(self, new_direction=None):
         """Изменение направления."""
         self.direction = new_direction
-        return new_direction
 
     def move(self):
         """Движение змеи."""
@@ -106,12 +105,14 @@ class Snake(GameObject):
         self.positions.insert(0, head)
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
+        else:
+            self.last = None
 
     def draw(self):
         """Отрисовка змеи."""
+        self.draw_single_cell(self.get_head_position())
         if self.last:
             self.delete_cell(self.last)
-        self.draw_single_cell(self.get_head_position())
 
     def get_head_position(self):
         """Позиция головы змеи"""
@@ -122,7 +123,6 @@ class Snake(GameObject):
         self.length = 1
         self.positions = [CENTER_POSITION]
         self.direction = RIGHT
-        self.next_direction = None
         screen.fill(BOARD_BACKGROUND_COLOR)
 
 
@@ -154,15 +154,14 @@ def main():
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
-        snake.update_direction(RIGHT)
         snake.move()
 
-        if snake.get_head_position() in snake.positions[2:]:
+        if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
-            apple.position = apple.randomize_position()
+            apple.position = apple.randomize_position(snake.positions)
         elif snake.get_head_position() == apple.position:
             snake.length = snake.length + 1
-            apple.position = apple.randomize_position()
+            apple.position = apple.randomize_position(snake.positions)
 
         snake.draw()
         apple.draw()
