@@ -43,8 +43,8 @@ class GameObject:
         self.position = position
         self.body_color = body_color
         self.border_color = BORDER_COLOR
-        self.last = None
         self.color = self.body_color
+        self.last = None
 
     def draw(self):
         """Отрисовка объектов."""
@@ -145,9 +145,7 @@ def handle_keys(game_object):
 
 def main():
     """Описание основной логики игры."""
-    # Инициализация pg:
     pg.init()
-    # Тут нужно создать экземпляры классов.
     apple = Apple()
     snake = Snake()
 
