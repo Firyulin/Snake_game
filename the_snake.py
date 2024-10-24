@@ -153,14 +153,12 @@ def main():
         clock.tick(SPEED)
         handle_keys(snake)
         snake.move()
-
         if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
             apple.position = apple.randomize_position(snake.positions)
         elif snake.get_head_position() == apple.position:
             snake.length = snake.length + 1
             apple.position = apple.randomize_position(snake.positions)
-
         snake.draw()
         apple.draw()
         pg.display.update()
