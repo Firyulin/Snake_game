@@ -20,6 +20,8 @@ BOARD_BACKGROUND_COLOR = (0, 0, 0)
 BORDER_COLOR = (93, 216, 228)
 APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
+# Цвет для определения ошибок в коде
+COLOR_ERROR = (255, 255, 255)
 
 # Скорость движения змейки:
 SPEED = 20
@@ -37,19 +39,22 @@ clock = pg.time.Clock()
 class GameObject:
     """Родительский class."""
 
-    def __init__(self, position=CENTER_POSITION,
-                 body_color=SNAKE_COLOR):
+    def __init__(
+        self,
+        position=CENTER_POSITION,
+        body_color=COLOR_ERROR
+    ):
         """Инициализатор родительского класса."""
         self.position = position
         self.body_color = body_color
         self.border_color = BORDER_COLOR
-        self.color = self.body_color
+        self.color = body_color
         self.last = None
 
     def draw(self):
         """Отрисовка объектов."""
 
-    def draw_single_cell(self, position):
+    def draw_cell(self, position):
         """Отрисовка клетки."""
         cell = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, self.color, cell)
@@ -66,7 +71,7 @@ class Apple(GameObject):
 
     def __init__(self, occupied_positions=None):
         if occupied_positions is None:
-            occupied_positions = []
+            occupied_positions = [CENTER_POSITION]
         super().__init__(position=self.randomize_position(occupied_positions),
                          body_color=APPLE_COLOR)
 
@@ -81,7 +86,7 @@ class Apple(GameObject):
 
     def draw(self):
         """Отрисовка яблока."""
-        self.draw_single_cell(self.position)
+        self.draw_cell(self.position)
 
 
 class Snake(GameObject):
@@ -91,7 +96,7 @@ class Snake(GameObject):
         super().__init__(position, body_color)
         self.reset()
 
-    def update_direction(self, new_direction=None):
+    def update_direction(self, new_direction):
         """Изменение направления."""
         self.direction = new_direction
 
@@ -110,7 +115,7 @@ class Snake(GameObject):
 
     def draw(self):
         """Отрисовка змеи."""
-        self.draw_single_cell(self.get_head_position())
+        self.draw_cell(self.get_head_position())
         if self.last:
             self.delete_cell(self.last)
 
@@ -123,7 +128,7 @@ class Snake(GameObject):
         self.length = 1
         self.positions = [CENTER_POSITION]
         self.direction = RIGHT
-        screen.fill(BOARD_BACKGROUND_COLOR)
+        self.last = 0
 
 
 def handle_keys(game_object):
@@ -146,8 +151,8 @@ def handle_keys(game_object):
 def main():
     """Описание основной логики игры."""
     pg.init()
-    apple = Apple()
     snake = Snake()
+    apple = Apple(snake.positions)
 
     while True:
         clock.tick(SPEED)
@@ -155,6 +160,7 @@ def main():
         snake.move()
         if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
+            screen.fill(BOARD_BACKGROUND_COLOR)
             apple.position = apple.randomize_position(snake.positions)
         elif snake.get_head_position() == apple.position:
             snake.length = snake.length + 1
